@@ -1,6 +1,6 @@
-resource "aws_security_group" "jenkins_sg" {
+resource "aws_security_group" "ec2_sg" {
 
-  name = "jenkins-security-group"
+  name = "ec2-server"
 
   ingress {
     description = "SSH"

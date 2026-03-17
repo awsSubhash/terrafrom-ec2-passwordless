@@ -1,11 +1,11 @@
-resource "aws_instance" "jenkins_server" {
+resource "aws_instance" "ec2-server" {
 
   ami           = var.ami_id
   instance_type = var.instance_type
   key_name      = var.key_name
 
   vpc_security_group_ids = [
-    aws_security_group.jenkins_sg.id
+    aws_security_group.ec2_sg.id
   ]
 
   user_data = <<-EOF
@@ -29,6 +29,6 @@ chmod 440 /etc/sudoers.d/$USERNAME
 EOF
 
   tags = {
-    Name = "Terraform-Jenkins-Server"
+    Name = "ec2-server"
   }
 }
