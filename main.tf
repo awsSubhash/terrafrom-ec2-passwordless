@@ -11,43 +11,67 @@ resource "aws_instance" "jenkins_server" {
   user_data = <<-EOF
 #!/bin/bash
 
-set -e
+# -----------------------------
+# USER CONFIGURATION SECTION
+# -----------------------------
+# Change the username if needed
+USERNAME="subhash"
 
-echo "Updating system packages..."
-sudo yum update -y
+# Replace this with your own public SSH key
+PUBLIC_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICrjFOXEHv8XayVTBqgkHog2gt+TqXOwy5culmTK68Oa SYNAMEDIA+skumarsingh@LTskumars-0DB88"
 
-echo "Installing Java 17 (Amazon Corretto)..."
-sudo yum install -y java-17-amazon-corretto
 
-echo "Adding Jenkins repository..."
-sudo wget -O /etc/yum.repos.d/jenkins.repo \
-https://pkg.jenkins.io/redhat-stable/jenkins.repo
+# -----------------------------
+# CREATE NEW USER
+# -m : create home directory
+# -s : default shell
+# -----------------------------
+useradd -m -s /bin/bash $USERNAME
 
-echo "Importing Jenkins GPG key..."
-sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
-echo "Installing Jenkins..."
-sudo yum install -y jenkins
+# -----------------------------
+# CREATE .ssh DIRECTORY
+# This is required for SSH key authentication
+# -----------------------------
+mkdir -p /home/$USERNAME/.ssh
 
-echo "Reloading systemd..."
-sudo systemctl daemon-reload
 
-echo "Starting Jenkins..."
-sudo systemctl start jenkins
+# -----------------------------
+# ADD PUBLIC KEY
+# This enables passwordless SSH login
+# Replace PUBLIC_KEY variable if needed
+# -----------------------------
+echo "$PUBLIC_KEY" > /home/$USERNAME/.ssh/authorized_keys
 
-echo "Enabling Jenkins at boot..."
-sudo systemctl enable jenkins
 
-echo "Jenkins installed successfully!"
+# -----------------------------
+# SET SECURE PERMISSIONS
+# SSH requires strict permissions
+# -----------------------------
+chmod 700 /home/$USERNAME/.ssh
+chmod 600 /home/$USERNAME/.ssh/authorized_keys
 
-echo "Initial Admin Password:"
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
-echo "Access Jenkins:"
-echo "http://<EC2-PUBLIC-IP>:8080"
+# -----------------------------
+# SET CORRECT OWNERSHIP
+# Ensure the new user owns the SSH files
+# -----------------------------
+chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh
 
-EOF
 
+# -----------------------------
+# OPTIONAL: GIVE PASSWORDLESS SUDO ACCESS
+# Remove this section if sudo access is not required
+# -----------------------------
+echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
+chmod 440 /etc/sudoers.d/$USERNAME
+
+
+# -----------------------------
+# SCRIPT COMPLETE
+# You can now login using:
+# ssh USERNAME@EC2_PUBLIC_IP
+# -----------------------------
   tags = {
     Name = "Terraform-Jenkins-Server"
   }
