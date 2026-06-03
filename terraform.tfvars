@@ -4,6 +4,6 @@ key_name      = "subhash-key"
 
 username      = "subhash"
 
-public_key    = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICrjFOXEHv8XayVTBqgkHog2gt+TqXOwy5culmTK68Oa SYNAMEDIA+skumarsingh@LTskumars-0DB88"
+public_key    = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK77GcYs1FvB9pdaaUuzw3jK7B6QVRBXmPBcWg+GeLZJ subha@Subhash"
 
 instance_name = "ec2-server"
